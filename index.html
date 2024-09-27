@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSV Data Viewer</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>CSV Data Analysis</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>CSV Data Viewer</h1>
-
-        <div id="categoryCounts"></div>
-        <div id="statisticalSummary"></div>
-
-        <div class="filter-section">
-            <h2>Filter Data</h2>
-            <select id="categorySelect"></select>
-            <input type="text" id="filterValue" placeholder="Enter filter value...">
-            <button id="filterButton">Filter</button>
-            <div id="filteredCount"></div>
-        </div>
+    <h1>CSV Data Analysis</h1>
+    <div>
+        <label for="category">Select Category:</label>
+        <select id="category">
+            <!-- Options will be populated dynamically -->
+        </select>
     </div>
-
+    <div>
+        <label for="value">Enter Value:</label>
+        <input type="text" id="value">
+    </div>
+    <button id="analyze">Analyze</button>
+    <div id="results">
+        <!-- Results will be displayed here -->
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
