@@ -1,62 +1,65 @@
-const csvFilePath = 'master_dataset.csv'; // Make sure this path is correct
+const csvFilePath = 'master_dataset.csv'; // Ensure this path is correct
 
 let data = [];
+const categories = [
+    "Name", "revised_gender", "UniversityType", "Institution", "archive_link",
+    "college_url", "scholar_profile_url", "State", "Specialisation", "AreaofInterest",
+    "UGDegree", "UGDepartment", "UGInstitute", "PGDegree", "PGDepartment", "PGInstitute",
+    "MPhil", "MPhilDepartment", "MPhilInstitute", "Doctoral", "DoctoralDepartment",
+    "DoctoralInstitute", "FirstJobPosition", "FirstJobInstitution", "FirstJobDuration",
+    "SecondJobPosition", "SecondJobInstitution", "SecondJobDuration", "ThirdJobPosition",
+    "ThirdJobInstitution", "ThirdJobDuration", "FourthJobPosition", "FourthJobInstitution",
+    "FourthJobDuration", "FifthJobPosition", "FifthJobInstitution", "FifthJobDuration",
+    "unique_id", "university_type", "name", "institution", "UniversityType_id",
+    "State_id", "Name_id", "Institution_id", "Current_Designation", "dept", "state",
+    "CurrentDesignation_r", "archive_timeline", "identifier", "names_scholar", "position",
+    "field", "total_citation", "citations_dynmc", "citation_5y_dynmc", "h-index",
+    "h-index_5y_dynmc", "i10-index", "i10-index_5y_dynmc", "profile_since", "co-authors",
+    "personal_site", "linkedin", "orcid", "personal_site_manual", "linkedin_site_manual",
+    "university_profile_manual", "research_gate_manual"
+];
 
-// Load the CSV file
-Papa.parse(csvFilePath, {
-    download: true,
-    header: true,
-    complete: (results) => {
-        data = results.data.filter(row => Object.keys(row).length > 0); // Clean empty rows
-        populateCategories();
-        displayCategoryCounts();
-    },
-    error: (error) => {
-        console.error("Error loading data:", error);
+// Load CSV data
+fetch(csvFilePath)
+    .then(response => response.text())
+    .then(csv => {
+        const rows = csv.split('\n').slice(1);
+        data = rows.map(row => row.split(',').map(cell => cell.trim()));
+        populateCategoryCounts();
+        populateCategorySelect();
+    })
+    .catch(error => console.error('Error loading CSV:', error));
+
+// Populate category counts
+function populateCategoryCounts() {
+    const counts = {};
+    for (let category of categories) {
+        counts[category] = data.filter(row => row[categories.indexOf(category)]).length;
     }
-});
 
-// Populate categories in the dropdown
-function populateCategories() {
-    const filterSelect = document.getElementById('filter');
-    const keys = Object.keys(data[0]); // Get keys from the first row to use as categories
+    const categoryCountsDiv = document.getElementById('categoryCounts');
+    categoryCountsDiv.innerHTML = '<h3>Counts per Category</h3>';
+    for (let [category, count] of Object.entries(counts)) {
+        categoryCountsDiv.innerHTML += `<p>${category}: ${count}</p>`;
+    }
+}
 
-    keys.forEach(key => {
+// Populate category select dropdown
+function populateCategorySelect() {
+    const categorySelect = document.getElementById('categorySelect');
+    categories.forEach(category => {
         const option = document.createElement('option');
-        option.value = key;
-        option.textContent = key;
-        filterSelect.appendChild(option);
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
     });
 }
 
-// Display count of people per category
-function displayCategoryCounts() {
-    const categoryCounts = document.getElementById('categoryCounts');
-    const keys = Object.keys(data[0]);
-
-    categoryCounts.innerHTML = ''; // Clear previous counts
-
-    keys.forEach(key => {
-        const count = data.reduce((acc, curr) => (curr[key] && curr[key].trim() !== '') ? acc + 1 : acc, 0);
-        categoryCounts.innerHTML += `<p>${key}: ${count}</p>`;
-    });
-}
-
-// Filter data based on user input
+// Filter data based on category and value
 document.getElementById('filterButton').addEventListener('click', () => {
-    const filter = document.getElementById('filter').value;
-    const filterValue = document.getElementById('filterValue').value.trim().toLowerCase();
+    const selectedCategory = document.getElementById('categorySelect').value;
+    const filterValue = document.getElementById('filterValue').value;
 
-    if (!filter || !filterValue) {
-        alert("Please select a category and enter a filter value.");
-        return;
-    }
-
-    const filteredData = data.filter(row => {
-        return row[filter] && row[filter].toLowerCase().includes(filterValue);
-    });
-
-    const filteredCount = filteredData.length;
-
-    document.getElementById('filteredCount').innerHTML = `Count for ${filter} = "${filterValue}": ${filteredCount}`;
+    const filteredCount = data.filter(row => row[categories.indexOf(selectedCategory)] === filterValue).length;
+    document.getElementById('filteredCount').innerHTML = `Count for ${selectedCategory} = "${filterValue}": ${filteredCount}`;
 });
