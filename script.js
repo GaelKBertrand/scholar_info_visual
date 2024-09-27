@@ -1,5 +1,89 @@
 let data = [];
 
+// List of allowed categories
+const allowedCategories = [
+    "Name",
+    "Gender",
+    "UniversityType",
+    "CurrentDesignation",
+    "Department",
+    "Institution",
+    "State",
+    "Specialisation",
+    "AreaofInterest",
+    "UGDegree",
+    "UGDepartment",
+    "UGInstitute",
+    "PGDegree",
+    "PGDepartment",
+    "PGInstitute",
+    "MPhil",
+    "MPhilDepartment",
+    "MPhilInstitute",
+    "Doctoral",
+    "DoctoralDepartment",
+    "DoctoralInstitute",
+    "FirstJobPosition",
+    "FirstJobInstitution",
+    "FirstJobDuration",
+    "SecondJobPosition",
+    "SecondJobInstitution",
+    "SecondJobDuration",
+    "ThirdJobPosition",
+    "ThirdJobInstitution",
+    "ThirdJobDuration",
+    "FourthJobPosition",
+    "FourthJobInstitution",
+    "FourthJobDuration",
+    "FifthJobPosition",
+    "FifthJobInstitution",
+    "FifthJobDuration",
+    "SixthJobPosition",
+    "SixthJobInstitution",
+    "SixthJobDuration",
+    "SeventhJobPosition",
+    "SeventhJobInstitution",
+    "SeventhJobDuration",
+    "EightJobPosition",
+    "EightJobInstitution",
+    "EightJobDuration",
+    "NinthJobPosition",
+    "NinthJobInstitution",
+    "NinthJobDuration",
+    "TenthJobPosition",
+    "TenthJobInstitution",
+    "TenthJobDuration",
+    "EleventhJobPosition",
+    "EleventhJobInstitution",
+    "EleventhJobDuration",
+    "TwelfthJobPosition",
+    "TwelfthJobInstitution",
+    "TwelfthJobDuration",
+    "ThirteenthJobPosition",
+    "ThirteenthJobInstitution",
+    "ThirteenthJobDuration",
+    "FourteenthJobPosition",
+    "FourteenthJobInstitution",
+    "FourteenthJobDuration",
+    "FifteenthJobPosition",
+    "FifteenthJobInstitution",
+    "FifteenthJobDuration",
+    "name",
+    "institution",
+    "state",
+    "State_id",
+    "Name_id",
+    "Institution_id",
+    "university_type",
+    "UniversityType_id",
+    "unique_id",
+    "gender",
+    "revised_gender_r",
+    "dept",
+    "Current_Designation",
+    "CurrentDesignation_r",
+];
+
 // Load the CSV data
 async function loadCSV() {
     const response = await fetch('master_dataset.csv'); // Ensure the CSV file is in the root directory
@@ -13,12 +97,10 @@ async function loadCSV() {
     populateFilters();
 }
 
-// Populate filter options dynamically
+// Populate filter options dynamically, only including allowed categories
 function populateFilters() {
     const filterSelect = document.getElementById('filter');
-    const categories = Object.keys(data[0]); // Get all column names
-
-    categories.forEach(category => {
+    allowedCategories.forEach(category => {
         const option = document.createElement('option');
         option.value = category;
         option.textContent = category;

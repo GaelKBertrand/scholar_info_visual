@@ -3,24 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Scholar Info Visualization</title>
+    <title>Scholar Info Visual</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>Scholar Info Visualization</h1>
-    </header>
-    <main>
-        <section>
-            <h2>Analytics</h2>
-            <label for="filter">Select a Category:</label>
-            <select id="filter" onchange="updateStats()">
-                <option value="" disabled selected>Select a category</option>
-                <!-- Options will be populated dynamically -->
-            </select>
-            <div id="stats"></div>
-        </section>
-    </main>
+    <div class="container">
+        <h1>Scholar Information Dashboard</h1>
+        <label for="filter">Select a category:</label>
+        <select id="filter" onchange="updateStats()">
+            <option value="">--Select a category--</option>
+        </select>
+        <div id="stats"></div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
