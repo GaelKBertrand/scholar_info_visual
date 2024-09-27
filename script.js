@@ -1,4 +1,4 @@
-const csvFilePath = 'master_dataset.csv'; // Ensure this path is correct
+const csvFilePath = 'master_dataset.csv'; // Make sure this path is correct
 
 let data = [];
 
@@ -7,7 +7,7 @@ Papa.parse(csvFilePath, {
     download: true,
     header: true,
     complete: (results) => {
-        data = results.data;
+        data = results.data.filter(row => Object.keys(row).length > 0); // Clean empty rows
         populateCategories();
         displayCategoryCounts();
     },
@@ -34,8 +34,10 @@ function displayCategoryCounts() {
     const categoryCounts = document.getElementById('categoryCounts');
     const keys = Object.keys(data[0]);
 
+    categoryCounts.innerHTML = ''; // Clear previous counts
+
     keys.forEach(key => {
-        const count = data.reduce((acc, curr) => curr[key] ? acc + 1 : acc, 0);
+        const count = data.reduce((acc, curr) => (curr[key] && curr[key].trim() !== '') ? acc + 1 : acc, 0);
         categoryCounts.innerHTML += `<p>${key}: ${count}</p>`;
     });
 }
@@ -50,9 +52,11 @@ document.getElementById('filterButton').addEventListener('click', () => {
         return;
     }
 
-    const filteredCount = data.filter(row => {
+    const filteredData = data.filter(row => {
         return row[filter] && row[filter].toLowerCase().includes(filterValue);
-    }).length;
+    });
+
+    const filteredCount = filteredData.length;
 
     document.getElementById('filteredCount').innerHTML = `Count for ${filter} = "${filterValue}": ${filteredCount}`;
 });
