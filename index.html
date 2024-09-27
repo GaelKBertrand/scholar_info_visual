@@ -3,26 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scholar Data Analytics</title>
+    <title>CSV Data Viewer</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Scholar Data Analytics</h1>
-        <h2>View Number of People by Category</h2>
-        <div id="categoryCounts"></div>
+        <h1>CSV Data Viewer</h1>
 
-        <h2>Filter Data</h2>
-        <div>
-            <label for="categorySelect">Select Category:</label>
+        <div id="categoryCounts"></div>
+        <div id="statisticalSummary"></div>
+
+        <div class="filter-section">
+            <h2>Filter Data</h2>
             <select id="categorySelect"></select>
-        </div>
-        <div>
-            <label for="filterValue">Enter Value:</label>
-            <input type="text" id="filterValue">
+            <input type="text" id="filterValue" placeholder="Enter filter value...">
             <button id="filterButton">Filter</button>
+            <div id="filteredCount"></div>
         </div>
-        <div id="filteredCount"></div>
     </div>
 
     <script src="script.js"></script>

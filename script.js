@@ -21,11 +21,16 @@ const categories = [
 
 // Load CSV data
 fetch(csvFilePath)
-    .then(response => response.text())
+    .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.text();
+    })
     .then(csv => {
         const rows = csv.split('\n').slice(1);
         data = rows.map(row => row.split(',').map(cell => cell.trim()));
+
         populateCategoryCounts();
+        populateStatisticalSummary();
         populateCategorySelect();
     })
     .catch(error => console.error('Error loading CSV:', error));
@@ -44,6 +49,25 @@ function populateCategoryCounts() {
     }
 }
 
+// Populate statistical summary
+function populateStatisticalSummary() {
+    const totalCitations = data.map(row => Number(row[categories.indexOf("total_citation")]) || 0);
+    const hIndex = data.map(row => Number(row[categories.indexOf("h-index")]) || 0);
+    const hIndex5y = data.map(row => Number(row[categories.indexOf("h-index_5y_dynmc")]) || 0);
+
+    const meanCitations = (totalCitations.reduce((a, b) => a + b, 0) / totalCitations.length).toFixed(2);
+    const meanHIndex = (hIndex.reduce((a, b) => a + b, 0) / hIndex.length).toFixed(2);
+    const meanHIndex5y = (hIndex5y.reduce((a, b) => a + b, 0) / hIndex5y.length).toFixed(2);
+
+    const statisticalSummaryDiv = document.getElementById('statisticalSummary');
+    statisticalSummaryDiv.innerHTML = `
+        <h3>Statistical Summary</h3>
+        <p>Mean Total Citations: ${meanCitations}</p>
+        <p>Mean H-Index: ${meanHIndex}</p>
+        <p>Mean H-Index (5 Years): ${meanHIndex5y}</p>
+    `;
+}
+
 // Populate category select dropdown
 function populateCategorySelect() {
     const categorySelect = document.getElementById('categorySelect');
@@ -58,8 +82,14 @@ function populateCategorySelect() {
 // Filter data based on category and value
 document.getElementById('filterButton').addEventListener('click', () => {
     const selectedCategory = document.getElementById('categorySelect').value;
-    const filterValue = document.getElementById('filterValue').value;
+    const filterValue = document.getElementById('filterValue').value.trim();
 
-    const filteredCount = data.filter(row => row[categories.indexOf(selectedCategory)] === filterValue).length;
-    document.getElementById('filteredCount').innerHTML = `Count for ${selectedCategory} = "${filterValue}": ${filteredCount}`;
+    const filteredData = data.filter(row => {
+        const cellValue = row[categories.indexOf(selectedCategory)];
+        return cellValue && cellValue.toLowerCase().includes(filterValue.toLowerCase());
+    });
+
+    const filteredCount = filteredData.length;
+
+    document.getElementById('filteredCount').innerHTML = `Count for "${filterValue}" in ${selectedCategory}: ${filteredCount}`;
 });
