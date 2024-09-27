@@ -90,17 +90,24 @@ async function loadCSV() {
     const text = await response.text();
     const rows = text.split('\n').slice(1); // Skip header row
     const keys = rows[0].split(',').map(key => key.trim()); // Get keys from the header
+
+    // Reset data array and process rows
     data = rows.map(row => {
         const values = row.split(',').map(value => value.trim()); // Trim values
         return Object.fromEntries(keys.map((key, index) => [key, values[index]]));
     });
-    populateFilters();
+
+    // Remove any categories that do not exist in the CSV
+    const validCategories = keys.filter(key => allowedCategories.includes(key));
+
+    // Clear and populate filter dropdown with valid categories
+    populateFilters(validCategories);
 }
 
 // Populate filter options dynamically, only including allowed categories
-function populateFilters() {
+function populateFilters(validCategories) {
     const filterSelect = document.getElementById('filter');
-    allowedCategories.forEach(category => {
+    validCategories.forEach(category => {
         const option = document.createElement('option');
         option.value = category;
         option.textContent = category;
@@ -114,10 +121,17 @@ function updateStats() {
     const selectedCategory = filterSelect.value;
     const categoryCounts = {};
 
+    if (!selectedCategory) {
+        document.getElementById('stats').innerHTML = '';
+        return; // No selection, clear stats
+    }
+
     // Count occurrences for the selected category
     data.forEach(item => {
         const value = item[selectedCategory];
-        categoryCounts[value] = (categoryCounts[value] || 0) + 1;
+        if (value) {
+            categoryCounts[value] = (categoryCounts[value] || 0) + 1;
+        }
     });
 
     // Display results
