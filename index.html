@@ -3,18 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scholar Info Visual</title>
     <link rel="stylesheet" href="styles.css">
+    <title>Scholar Info Visualization</title>
 </head>
 <body>
     <div class="container">
         <h1>Scholar Information Dashboard</h1>
-        <label for="filter">Select a category:</label>
-        <select id="filter" onchange="updateStats()">
+
+        <label for="filter">Select Category:</label>
+        <select id="filter">
             <option value="">--Select a category--</option>
         </select>
-        <div id="stats"></div>
+
+        <label for="filterValue">Filter Value:</label>
+        <input type="text" id="filterValue" placeholder="Enter value to filter">
+
+        <button id="filterButton">Filter</button>
+
+        <h2>Results</h2>
+        <div id="results"></div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>

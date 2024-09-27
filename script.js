@@ -1,113 +1,29 @@
-let data = [];
-
-// List of allowed categories
-const allowedCategories = [
-    "Name",
-    "Gender",
-    "UniversityType",
-    "CurrentDesignation",
-    "Department",
-    "Institution",
-    "State",
-    "Specialisation",
-    "AreaofInterest",
-    "UGDegree",
-    "UGDepartment",
-    "UGInstitute",
-    "PGDegree",
-    "PGDepartment",
-    "PGInstitute",
-    "MPhil",
-    "MPhilDepartment",
-    "MPhilInstitute",
-    "Doctoral",
-    "DoctoralDepartment",
-    "DoctoralInstitute",
-    "FirstJobPosition",
-    "FirstJobInstitution",
-    "FirstJobDuration",
-    "SecondJobPosition",
-    "SecondJobInstitution",
-    "SecondJobDuration",
-    "ThirdJobPosition",
-    "ThirdJobInstitution",
-    "ThirdJobDuration",
-    "FourthJobPosition",
-    "FourthJobInstitution",
-    "FourthJobDuration",
-    "FifthJobPosition",
-    "FifthJobInstitution",
-    "FifthJobDuration",
-    "SixthJobPosition",
-    "SixthJobInstitution",
-    "SixthJobDuration",
-    "SeventhJobPosition",
-    "SeventhJobInstitution",
-    "SeventhJobDuration",
-    "EightJobPosition",
-    "EightJobInstitution",
-    "EightJobDuration",
-    "NinthJobPosition",
-    "NinthJobInstitution",
-    "NinthJobDuration",
-    "TenthJobPosition",
-    "TenthJobInstitution",
-    "TenthJobDuration",
-    "EleventhJobPosition",
-    "EleventhJobInstitution",
-    "EleventhJobDuration",
-    "TwelfthJobPosition",
-    "TwelfthJobInstitution",
-    "TwelfthJobDuration",
-    "ThirteenthJobPosition",
-    "ThirteenthJobInstitution",
-    "ThirteenthJobDuration",
-    "FourteenthJobPosition",
-    "FourteenthJobInstitution",
-    "FourteenthJobDuration",
-    "FifteenthJobPosition",
-    "FifteenthJobInstitution",
-    "FifteenthJobDuration",
-    "name",
-    "institution",
-    "state",
-    "State_id",
-    "Name_id",
-    "Institution_id",
-    "university_type",
-    "UniversityType_id",
-    "unique_id",
-    "gender",
-    "revised_gender_r",
-    "dept",
-    "Current_Designation",
-    "CurrentDesignation_r",
-];
-
-// Load the CSV data
-async function loadCSV() {
-    const response = await fetch('master_dataset.csv'); // Ensure the CSV file is in the root directory
-    const text = await response.text();
-    const rows = text.split('\n').slice(1); // Skip header row
-    const keys = rows[0].split(',').map(key => key.trim()); // Get keys from the header
-
-    // Reset data array and process rows
-    data = rows.map(row => {
-        const values = row.split(',').map(value => value.trim()); // Trim values
-        return Object.fromEntries(keys.map((key, index) => [key, values[index]]));
-    });
-
-    // Remove any categories that do not exist in the CSV
-    const validCategories = keys.filter(key => allowedCategories.includes(key));
-
-    // Clear and populate filter dropdown with valid categories
-    populateFilters(validCategories);
-}
-
-// Populate filter options dynamically, only including allowed categories
-function populateFilters(validCategories) {
+// Load categories based on the specified columns
+function loadCategories() {
     const filterSelect = document.getElementById('filter');
-    validCategories.forEach(category => {
+    const predefinedCategories = [
+        "Name", "revised_gender", "UniversityType", "Institution", "archive_link",
+        "college_url", "scholar_profile_url", "State", "Specialisation",
+        "AreaofInterest", "UGDegree", "UGDepartment", "UGInstitute", "PGDegree",
+        "PGDepartment", "PGInstitute", "MPhil", "MPhilDepartment",
+        "MPhilInstitute", "Doctoral", "DoctoralDepartment", "DoctoralInstitute",
+        "FirstJobPosition", "FirstJobInstitution", "FirstJobDuration",
+        "SecondJobPosition", "SecondJobInstitution", "SecondJobDuration",
+        "ThirdJobPosition", "ThirdJobInstitution", "ThirdJobDuration",
+        "FourthJobPosition", "FourthJobInstitution", "FourthJobDuration",
+        "FifthJobPosition", "FifthJobInstitution", "FifthJobDuration",
+        "unique_id", "university_type", "name", "institution",
+        "UniversityType_id", "State_id", "Name_id", "Institution_id",
+        "Current_Designation", "dept", "state", "CurrentDesignation_r",
+        "archive_timeline", "identifier", "names_scholar", "position",
+        "field", "total_citation", "citations_dynmc", "citation_5y_dynmc",
+        "h-index", "h-index_5y_dynmc", "i10-index", "i10-index_5y_dynmc",
+        "profile_since", "co-authors", "personal_site", "linkedin",
+        "orcid", "personal_site_manual", "linkedin_site_manual",
+        "university_profile_manual", "research_gate_manual"
+    ];
+
+    predefinedCategories.forEach(category => {
         const option = document.createElement('option');
         option.value = category;
         option.textContent = category;
@@ -115,32 +31,48 @@ function populateFilters(validCategories) {
     });
 }
 
-// Update statistics based on selected category
-function updateStats() {
-    const filterSelect = document.getElementById('filter');
-    const selectedCategory = filterSelect.value;
-    const categoryCounts = {};
+// Function to filter and display results
+function filterData() {
+    const filter = document.getElementById('filter').value;
+    const filterValue = document.getElementById('filterValue').value;
+    const resultsDiv = document.getElementById('results');
 
-    if (!selectedCategory) {
-        document.getElementById('stats').innerHTML = '';
-        return; // No selection, clear stats
-    }
+    // Clear previous results
+    resultsDiv.innerHTML = '';
 
-    // Count occurrences for the selected category
-    data.forEach(item => {
-        const value = item[selectedCategory];
-        if (value) {
-            categoryCounts[value] = (categoryCounts[value] || 0) + 1;
-        }
-    });
+    // Fetch the data from the CSV file
+    fetch('master_dataset.csv')
+        .then(response => response.text())
+        .then(data => {
+            const rows = data.split('\n').slice(1); // Skip header row
+            let count = 0;
 
-    // Display results
-    const statsDiv = document.getElementById('stats');
-    statsDiv.innerHTML = `<h3>Counts for ${selectedCategory}:</h3>`;
-    for (const [key, count] of Object.entries(categoryCounts)) {
-        statsDiv.innerHTML += `<p>${key}: ${count}</p>`;
-    }
+            rows.forEach(row => {
+                const columns = row.split(',');
+                const rowObject = {};
+
+                // Create an object with the column names as keys
+                columns.forEach((value, index) => {
+                    rowObject[predefinedCategories[index]] = value.trim();
+                });
+
+                // Filter based on selected category and value
+                if (rowObject[filter] && rowObject[filter].toLowerCase() === filterValue.toLowerCase()) {
+                    count++;
+                }
+            });
+
+            // Display the count of matching records
+            resultsDiv.textContent = `Count: ${count}`;
+        })
+        .catch(error => {
+            console.error('Error fetching CSV file:', error);
+            resultsDiv.textContent = 'Error loading data.';
+        });
 }
 
-// Initialize the app
-loadCSV();
+// Event listener for the filter button
+document.getElementById('filterButton').addEventListener('click', filterData);
+
+// Load categories when the page is loaded
+window.onload = loadCategories;
