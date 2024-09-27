@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function parseCSV(data) {
         const rows = data.split('\n').map(row => row.split(','));
         const headers = rows[0];
-        const values = rows.slice(1);
+        const values = rows.slice(1).filter(row => row.length === headers.length); // Ensure rows match header length
         return { headers, values };
     }
 
